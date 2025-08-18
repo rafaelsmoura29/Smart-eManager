@@ -1,0 +1,22 @@
+# ========================
+# Requisitos para o projeto Smart-eManager
+# ========================
+
+# ---- Otimização (PC) ----
+pyomo==6.7.0
+matplotlib==3.9.0
+numpy==1.26.4
+pandas==2.2.2
+requests==2.32.3
+
+# Biblioteca CPLEX (instalada separadamente)
+# pip install cplex
+# ou via IBM ILOG CPLEX Optimization Studio
+
+# ---- Comunicação Servidor/Cliente ----
+fastapi==0.112.2
+uvicorn[standard]==0.30.6
+python-multipart==0.0.9
+
+# ---- Raspberry Pi (GPIO) ----
+RPi.GPIO==0.7.1
