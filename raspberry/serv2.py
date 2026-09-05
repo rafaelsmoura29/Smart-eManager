@@ -68,21 +68,22 @@ async def status_servidor():
     }
 
 
-# Função para aplicar os estados das cargas com intervalo de 15 minutos (simulado como 15 segundos para testes)
-async def controlar_leds_por_intervalo(dados):
+# Função para aplicar os estados das cargas com intervalo de 15 minutos (simulado por padrão como 15 segundos)
+async def controlar_leds_por_intervalo(dados, delay_segundos=15):
     total_intervalos = len(next(iter(dados.values())))
     for t in range(total_intervalos):
-        print(f"\n⏱️ Intervalo {t}")
+        logger.info(f"--- [Intervalo {t:02d} / {total_intervalos}] ---")
         for carga, estados in dados.items():
             if carga in MAPEAMENTO_CARGAS:
-                estado = estados[t]
+                estado = estados[t] if t < len(estados) else 0
                 pino = MAPEAMENTO_CARGAS[carga]
                 GPIO.output(pino, GPIO.HIGH if estado == 1 else GPIO.LOW)
-                print(f"  🔄 {carga} -> {'Ligado' if estado == 1 else 'Desligado'} (PINO {pino})")
-        await asyncio.sleep(15)  # 15 segundos para simular 15 minutos
+                status_str = "LIGADO (ON)" if estado == 1 else "DESLIGADO (OFF)"
+                logger.info(f"  -> {carga:18s} : {status_str} [GPIO {pino}]")
+        await asyncio.sleep(delay_segundos)
 
 @app.post("/atualizar_cargas")
-async def atualizar_cargas(request: Request):
+async def atualizar_cargas(request: Request, delay: float = 15.0):
     try:
         dados = await request.json()
 
@@ -90,8 +91,15 @@ async def atualizar_cargas(request: Request):
             return {"erro": "Formato inválido. Esperado dicionário JSON."}
 
         # Inicia o controle assíncrono dos LEDs baseado nos dados recebidos
-        asyncio.create_task(controlar_leds_por_intervalo(dados))
+        asyncio.create_task(controlar_leds_por_intervalo(dados, delay_segundos=delay))
 
-        return {"mensagem": "📥 JSON recebido com sucesso. Iniciando controle de cargas."}
+        return {
+            "status": "sucesso",
+            "mensagem": "JSON recebido com sucesso. Iniciando controle de cargas.",
+            "total_cargas": len(dados),
+            "delay_intervalo_s": delay
+        }
     except Exception as e:
+        logger.error(f"Erro ao processar JSON: {e}")
         return {"erro": f"Erro ao processar JSON: {e}"}
+
