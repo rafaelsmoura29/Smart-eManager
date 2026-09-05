@@ -1,0 +1,44 @@
+# ================================
+# Git Ignore - Smart-eManager
+# ================================
+
+# Byte-compiled / optimized / cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Virtual Environments
+ambiente/
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Solvers & Optimization output logs
+cplex.log
+*.lp
+*.mps
+*.sol
+*.nl
+
+# Logs & Temporary files
+*.log
+scratch/
+*.tmp
+
+# Operating System files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace

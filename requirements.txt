@@ -1,22 +1,29 @@
-# ========================
-# Requisitos para o projeto Smart-eManager
-# ========================
 
-# ---- Otimização (PC) ----
+
+# ===================================================
+# Smart-eManager - Dependências do Sistema (PC / Otimizador)
+# ===================================================
+
+# Modelagem Matemática e Otimização
 pyomo==6.7.0
-matplotlib==3.9.0
 numpy==1.26.4
 pandas==2.2.2
+matplotlib==3.9.0
+networkx>=3.0
+openpyxl>=3.1.0
+
+# Comunicação HTTP e Servidor Local (Testes)
 requests==2.32.3
-
-# Biblioteca CPLEX (instalada separadamente)
-# pip install cplex
-# ou via IBM ILOG CPLEX Optimization Studio
-
-# ---- Comunicação Servidor/Cliente ----
 fastapi==0.112.2
 uvicorn[standard]==0.30.6
 python-multipart==0.0.9
 
-# ---- Raspberry Pi (GPIO) ----
-RPi.GPIO==0.7.1
+# Jupyter Notebook (Opcional, para execução de notebooks)
+notebook>=7.0.0
+ipykernel>=6.0.0
+
+# NOTA SOBRE SOLVERS:
+# O modelo estocástico utiliza o solver CPLEX.
+# O CPLEX deve ser instalado via IBM ILOG CPLEX Optimization Studio
+# ou pacote compatível (pip install cplex).
+# Para usar na Raspberry Pi, consulte requirements-rpi.txt.

@@ -1,14 +1,50 @@
 from fastapi import FastAPI, Request
-import RPi.GPIO as GPIO
 import asyncio
+import logging
 
-app = FastAPI()
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("smart-emanager-server")
+
+# Tratamento para execução em Raspberry Pi ou em modo simulação (PC/Windows/Mac)
+try:
+    import RPi.GPIO as GPIO
+    IS_RPI = True
+    logger.info("Modo Raspberry Pi detectado: RPi.GPIO carregado com sucesso.")
+except (ImportError, RuntimeError):
+    IS_RPI = False
+    logger.warning("RPi.GPIO não disponível. Executando em modo de SIMULAÇÃO (Mock GPIO).")
+
+    class MockGPIO:
+        BCM = "BCM"
+        OUT = "OUT"
+        HIGH = 1
+        LOW = 0
+
+        @staticmethod
+        def setmode(mode):
+            pass
+
+        @staticmethod
+        def setup(pin, mode):
+            pass
+
+        @staticmethod
+        def output(pin, val):
+            pass
+
+    GPIO = MockGPIO()
+
+app = FastAPI(
+    title="Smart-eManager - Raspberry Pi Controller",
+    description="Servidor de controle de cargas via GPIO para simulação física em LEDs",
+    version="1.0.0"
+)
 
 # Mapeamento entre nomes de cargas e pinos dos LEDs
 MAPEAMENTO_CARGAS = {
-	"MaquinaDeLavar":17,
+	"MaquinaDeLavar": 17,
 	"FornoEletrico": 18,
-	"Aquecedor":27,
+	"Aquecedor": 27,
 	"LavadoraDePratos": 22,
 	"ArCondicionado1": 23,
 	"ArCondicionado2": 24,
@@ -21,6 +57,16 @@ GPIO.setmode(GPIO.BCM)
 for pino in MAPEAMENTO_CARGAS.values():
     GPIO.setup(pino, GPIO.OUT)
     GPIO.output(pino, GPIO.LOW)
+
+@app.get("/")
+async def status_servidor():
+    return {
+        "status": "online",
+        "sistema": "Smart-eManager Raspberry Pi Controller",
+        "modo_rpi": IS_RPI,
+        "cargas_mapeadas": list(MAPEAMENTO_CARGAS.keys())
+    }
+
 
 # Função para aplicar os estados das cargas com intervalo de 15 minutos (simulado como 15 segundos para testes)
 async def controlar_leds_por_intervalo(dados):

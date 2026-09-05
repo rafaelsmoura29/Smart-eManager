@@ -541,25 +541,6 @@ def plotar_demanda(model):
     print('demanda total')
     print(demanda_total)
 
-def exportar_todas_as_cargas_para_json(model, caminho="cargas_status.json"):
-    import json  # Certifique-se de importar o módulo json
-
-    resultado = {}
-
-    for carga in model.cargas:
-        nome = str(carga)
-        resultado[nome] = []
-        for t in range(96):
-            valor = pyo.value(model.cargas_var_ligadas[carga, t])
-            resultado[nome].append(1 if valor >= 0.5 else 0)
-
-    with open(caminho, "w") as f:
-        json.dump(resultado, f, indent=4)
-
-    print(f"JSON exportado para: {caminho}")
-    return caminho
-
-
     # Plotar a demanda das cargas não deslocáveis
     plt.figure(figsize=(12, 6))
     plt.plot(time_index, demanda_nao_deslocavel, label="Demanda Cargas Não Deslocáveis", color='blue', linestyle='-', linewidth=2)
@@ -587,6 +568,31 @@ def exportar_todas_as_cargas_para_json(model, caminho="cargas_status.json"):
     # Exibir o gráfico
     plt.show()
 
+def exportar_todas_as_cargas_para_json(model, caminho=None):
+    import json
+
+    if caminho is None:
+        caminho_padrao = pathlib.Path(__file__).parent.parent / "data" / "cargas_status.json"
+        if caminho_padrao.parent.exists():
+            caminho = str(caminho_padrao)
+        else:
+            caminho = "cargas_status.json"
+
+    resultado = {}
+
+    for carga in model.cargas:
+        nome = str(carga)
+        resultado[nome] = []
+        for t in range(96):
+            valor = pyo.value(model.cargas_var_ligadas[carga, t])
+            resultado[nome].append(1 if valor >= 0.5 else 0)
+
+    with open(caminho, "w", encoding="utf-8") as f:
+        json.dump(resultado, f, indent=4)
+
+    print(f"JSON exportado para: {caminho}")
+    return caminho
+
 if __name__ == '__main__':
     config = {
         'has_storage': True,
@@ -603,6 +609,7 @@ if __name__ == '__main__':
         'gen_kw': 1.0
         }
         
+    model = main(data=config)
     plot_energy_results(model)
     plotar_cargas_demanda_precos(model)
     plotar_soc_e_power(model)
@@ -616,3 +623,4 @@ if __name__ == '__main__':
     plotar_funcao_objetivo_e_demanda_total(model)
     plotar_demanda(model)
     exportar_todas_as_cargas_para_json(model)
+

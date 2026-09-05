@@ -1,0 +1,11 @@
+# ===================================================
+# Smart-eManager - Dependências da Raspberry Pi (Atuação Física)
+# ===================================================
+
+# Servidor Web Assíncrono para Recepção de Comandos
+fastapi==0.112.2
+uvicorn[standard]==0.30.6
+python-multipart==0.0.9
+
+# Controle Físico dos Pinos GPIO (Apenas em Linux / ARM Raspberry Pi)
+RPi.GPIO==0.7.1

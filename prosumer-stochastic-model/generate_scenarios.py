@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import json
 import pathlib
 import sys
+sys.path.append(str(pathlib.Path(__file__).parent.absolute()))
 sys.path.append('../')
 
 from load_data import get_load_data, get_gen_data, get_spot_prices_data
